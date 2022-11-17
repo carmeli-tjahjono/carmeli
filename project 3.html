@@ -6,7 +6,7 @@
 -->
 <html>
 	<head>
-		<title>Carmeli-8 Wks SQL Challenge</title>
+		<title>Carmeli-Dannys Diner by Danny Ma</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -53,22 +53,62 @@
 											</p>
 									</header>
 									<span class="image featured"><img src="images/8WkSQLChallenge/Dannys Diner.png"width="350"height="350" alt="" /></span>
-									<p> My first SQL project where I worked through the 10 questions in this case study.
-									<br> Read about the challenge here <a href="https://8weeksqlchallenge.com/case-study-1/" class="action">Dannys Diner</a> 
-									<p>See my <a href="https://github.com/carmeli-tjahjono/Danny-Ma-SQL-Challenge/blob/main/Case%20Study%20%231%20Tables%20%26%20Solutions.md" class=""action"> solution</a>
-									
-									<p>Case Study Questions:
+									<p> SQL project where I worked through the 10 questions in this case study by Danny Ma.
+										<p> Problem Statement:
+											<br>Dannys Diner wants to use the data to answer a few simple questions about his customers, especially about their visiting patterns, how much money they’ve spent and also which menu items are their favourite.
+											<p>More about this case study: <a href="https://8weeksqlchallenge.com/case-study-1/" class="action">Dannys Diner</a> 
+									<p>See my <a href="https://github.com/carmeli-tjahjono/Danny-Ma-SQL-Challenge/blob/main/Case%20Study%20%231%20Tables%20%26%20Solutions.md" class=""action"> full solution on github</a>
+									<p>Here is couple questions and my solutions:
+										
 									<p>1. What is the total amount each customer spent at the restaurant? 
+										<br>SELECT customer_id, SUM(product_id*price) AS total_spent
+										<br>FROM dannys_diner.sales
+										<br>JOIN dannys_diner.menu
+										<br>USING (product_id)
+										<br>GROUP BY customer_id
+										<br>ORDER BY customer_id
+										<br><span class="image"><img src="images/8WkSQLChallenge/Q1.png"width="300"height="200" alt="" /></span>
 									<br>2. How many days has each customer visited the restaurant?
+										<br>SELECT customer_id, COUNT(DISTINCT order_date) as total_days
+										<br>FROM dannys_diner.sales
+										<br>GROUP BY customer_id
+										<br><span class="image"><img src="images/8WkSQLChallenge/Q2.png"width="300"height="200" alt="" /></span>
 									<br>3. What was the first item from the menu purchased by each customer?
+										<br>SELECT customer_id, product_name, rank
+										<br>FROM (
+										<br>&emsp; SELECT customer_id, product_id, 
+										<br>&emsp;	DENSE_RANK () OVER (PARTITION BY customer_id ORDER BY order_date) AS rank
+										<br>&emsp;	FROM dannys_diner.sales
+										<br>&emsp;	GROUP BY customer_id, product_id, order_date
+										<br>) AS rank_table
+										<br>JOIN dannys_diner.menu
+										<br>USING (product_id)
+										<br>WHERE rank =1
+										<br>ORDER BY customer_id
+										<br><span class="image"><img src="images/8WkSQLChallenge/Q3.png"width="400"height="200" alt="" /></span>
 									<br>4. What is the most purchased item on the menu and how many times was it purchased by all customers?
+										<br>SELECT product_name, COUNT (product_id)
+										<br>FROM dannys_diner.sales
+										<br>JOIN dannys_diner.menu
+										<br>USING (product_id)
+										<br>GROUP BY product_name
+										<br>ORDER BY count DESC
+										<br>LIMIT 1
+										<br><span class="image"><img src="images/8WkSQLChallenge/Q4.png"width="250"height="100" alt="" /></span>
 									<br>5. Which item was the most popular for each customer?
-									<br>6. Which item was purchased first by the customer after they became a member?
-									<br>7. Which item was purchased just before the customer became a member?
-									<br>8. What is the total items and amount spent for each member before they became a member?
-									<br>9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
-									<br>10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
-									
+										<br>WITH rank AS (
+										<br>  &emsp;SELECT customer_id, product_name, COUNT(product_id),
+										<br>  &emsp;DENSE_RANK () OVER (PARTITION BY customer_id ORDER BY product_id DESC) as rank
+										<br>  &emsp;JOIN dannys_diner.sales
+										<br>  &emsp;USING (product_id)
+										<br>  &emsp;GROUP BY customer_id, product_id, product_name
+										<br>  &emsp;)
+
+										<p>  SELECT customer_id, product_name, count
+										<br>  FROM rank
+										<br>  WHERE rank = 1
+										<br><span class="image"><img src="images/8WkSQLChallenge/Q5.png" width="400" height="200" alt="" /></span>
+																		
 								</div>
 							</section>
 
